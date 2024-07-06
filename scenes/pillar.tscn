@@ -1,0 +1,154 @@
+[gd_scene load_steps=16 format=3 uid="uid://bl3wk5r2o6ken"]
+
+[ext_resource type="Script" path="res://scripts/pillar.gd" id="1_fswve"]
+[ext_resource type="Texture2D" uid="uid://df7jkrt74eced" path="res://images/spritesheet (1).png" id="2_74swx"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wdqna"]
+atlas = ExtResource("2_74swx")
+region = Rect2(0, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ds8gs"]
+atlas = ExtResource("2_74swx")
+region = Rect2(300, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i6vyj"]
+atlas = ExtResource("2_74swx")
+region = Rect2(600, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uqr50"]
+atlas = ExtResource("2_74swx")
+region = Rect2(900, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lh18x"]
+atlas = ExtResource("2_74swx")
+region = Rect2(1200, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sko7k"]
+atlas = ExtResource("2_74swx")
+region = Rect2(1500, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eyo0u"]
+atlas = ExtResource("2_74swx")
+region = Rect2(1800, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v472y"]
+atlas = ExtResource("2_74swx")
+region = Rect2(2100, 0, 300, 300)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_effpd"]
+atlas = ExtResource("2_74swx")
+region = Rect2(2400, 0, 300, 300)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_gsgf5"]
+animations = [{
+"frames": [{
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_wdqna")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_ds8gs")
+}, {
+"duration": 1.5,
+"texture": SubResource("AtlasTexture_i6vyj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uqr50")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lh18x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sko7k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eyo0u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v472y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_effpd")
+}],
+"loop": true,
+"name": &"new_animation",
+"speed": 12.0
+}]
+
+[sub_resource type="Animation" id="Animation_xtpbq"]
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_m4u77"]
+resource_name = "pillar"
+length = 1.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("AnimatedSprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [1, 2, 3, 4, 5, 6, 7, 8]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("AnimatedSprite2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_j27b2"]
+_data = {
+"RESET": SubResource("Animation_xtpbq"),
+"pillar": SubResource("Animation_m4u77")
+}
+
+[node name="Pillar" type="StaticBody2D" groups=["pillars"]]
+scale = Vector2(1.46066, 1.54416)
+collision_layer = 2
+collision_mask = 7
+script = ExtResource("1_fswve")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(2, -204)
+scale = Vector2(1.34, 1.35333)
+sprite_frames = SubResource("SpriteFrames_gsgf5")
+animation = &"new_animation"
+frame = 8
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+libraries = {
+"": SubResource("AnimationLibrary_j27b2")
+}
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0, -29.0005)
+scale = Vector2(5.27674, 0.662)
+target_position = Vector2(0.389231, 5825.27)
+collision_mask = 4
+
+[node name="RayCast2D2" type="RayCast2D" parent="RayCast2D"]
+unique_name_in_owner = true
+position = Vector2(4.54102, -0.213835)
+target_position = Vector2(0.389231, 5825.27)
+collision_mask = 4
+
+[node name="RayCast2D3" type="RayCast2D" parent="RayCast2D"]
+unique_name_in_owner = true
+position = Vector2(-5.05999, 0.764414)
+target_position = Vector2(0.389231, 5825.27)
+collision_mask = 4
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-86.2624, -192.338, -63.6698, -214.356, 46.5543, -217.594, 86.947, -205.29, 74.6238, -0.647601, -68.4622, 0.647601)

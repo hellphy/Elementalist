@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://dkofnct1k316"]
+
+[ext_resource type="Script" path="res://scripts/spawner.gd" id="1_2njpg"]
+
+[node name="spawner" type="Marker2D"]
+position = Vector2(31409, 105)
+script = ExtResource("1_2njpg")
+
+[node name="Timer" type="Timer" parent="."]
+unique_name_in_owner = true
+wait_time = 4.0
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

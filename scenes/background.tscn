@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://xnlmnro5wjb8"]
+
+[ext_resource type="Texture2D" uid="uid://bh3biy447ivsl" path="res://images/bg.jpg" id="1_njd0t"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_igjam"]
+texture = ExtResource("1_njd0t")
+texture_region_size = Vector2i(1964, 5324)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_0q5h6"]
+tile_size = Vector2i(1964, 5324)
+sources/0 = SubResource("TileSetAtlasSource_igjam")
+
+[node name="TileMap" type="TileMap"]
+tile_set = SubResource("TileSet_0q5h6")
+format = 2
+layer_0/tile_data = PackedInt32Array(65529, 0, 0, 65530, 0, 0, 65531, 0, 0, 65532, 0, 0, 65533, 0, 0, 65534, 0, 0, 65535, 0, 0, 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 6, 0, 0, 7, 0, 0, 8, 0, 0, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 0, 13, 0, 0, 14, 0, 0, 15, 0, 0)
