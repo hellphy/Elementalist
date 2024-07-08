@@ -214,9 +214,8 @@ animations = [{
 "speed": 18.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_nvht1"]
-radius = 35.0
-height = 144.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6bbpt"]
+size = Vector2(61, 179)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7fwgf"]
 size = Vector2(1028, 708)
@@ -239,8 +238,8 @@ sprite_frames = SubResource("SpriteFrames_xq1br")
 animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(10, 39)
-shape = SubResource("CapsuleShape2D_nvht1")
+position = Vector2(9.5, 20.5)
+shape = SubResource("RectangleShape2D_6bbpt")
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 unique_name_in_owner = true

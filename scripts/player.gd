@@ -7,18 +7,20 @@ signal jumping
 #gravity
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var max_velocity = 1000
+var sliding_grav = gravity * 0.3
 
 #player movement variables
 var face_dir = 1
 var speed = 600
 var max_speed = 1200
 var deceleration = 3000
+var dir
 
 var acceleration = 2800
 var turning_acceleration = 9600
 
-var jump := 1400
-
+var jump := 1300
+var wall_pushback = 1300
 
 @onready var animations: AnimatedSprite2D = %animations
 @onready var state_label: Label = %StateLabel
@@ -42,7 +44,6 @@ func change_state(new_state):
 func _physics_process(delta: float) -> void:
 	state_label.text = str(States.keys()[current_State])
 	movement(delta)
-	print(coyote_timer.time_left)
 	match current_State:
 		
 		States.IDLE:
@@ -68,7 +69,7 @@ func _physics_process(delta: float) -> void:
 				coyote_timer.start()
 				change_state(States.AIR)
 
-				
+
 		States.AIR:
 			apply_gravity(delta)
 			if Input.is_action_just_pressed("jump") and coyote_timer.time_left != 0:
@@ -83,10 +84,32 @@ func _physics_process(delta: float) -> void:
 				change_state(States.IDLE)
 			if is_on_floor() and velocity.x != 0:
 				change_state(States.RUN)
-			
+			if is_on_wall_only() and dir != 0:
+				velocity.y = 0
+				change_state(States.SLIDING)
+
+
 		States.SLIDING:
-			pass
-			
+			if Input.is_action_just_pressed("jump"):
+				if dir == 1:
+					velocity.y += -jump
+					velocity.x += -wall_pushback
+				elif dir == -1:
+					velocity.y += -jump
+					velocity.x += wall_pushback
+				else:
+					pass
+
+			apply_sliding_gravity(delta)
+			if is_on_floor() and velocity.x == 0:
+				change_state(States.IDLE)
+			if is_on_floor() and velocity.x != 0:
+				change_state(States.RUN)
+			if !is_on_wall() and !is_on_floor():
+				change_state(States.AIR)
+			if dir == 0 and is_on_wall_only():
+				change_state(States.AIR)
+
 		States.FALL:
 			pass
 			
@@ -174,9 +197,11 @@ func _on_area_2d_body_entered(body: Node2D) -> void: call_deferred("exit")
 func apply_gravity(delta):
 		velocity.y = minf(max_velocity, velocity.y + gravity * delta)
 
+func apply_sliding_gravity(delta):
+	velocity.y = minf(max_velocity, velocity.y + sliding_grav * delta)
 
 func movement(delta):
-	var dir = Input.get_axis("left","right")
+	dir = Input.get_axis("left","right")
 	if dir == 0:
 		velocity.x = Vector2(velocity.x, 0).move_toward(Vector2(0,0), deceleration * delta).x
 		return
