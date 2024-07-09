@@ -15,12 +15,12 @@ var speed = 600
 var max_speed = 1200
 var deceleration = 3000
 var dir
-
 var acceleration = 2800
 var turning_acceleration = 9600
-
 var jump := 1300
 var wall_pushback = 1300
+
+
 
 @onready var animations: AnimatedSprite2D = %animations
 @onready var state_label: Label = %StateLabel
@@ -31,6 +31,10 @@ var wall_pushback = 1300
 @onready var jump_buffer: Timer = %JumpBuffer
 @onready var coyote_timer: Timer = %CoyoteTimer
 
+
+var elements: Array = ["earth", "water", "fire", "air"]
+var element_index = 0
+var current_element: String
 
 enum States {IDLE, RUN, AIR, SLIDING, CASTING, FALL}
 
@@ -43,6 +47,8 @@ func change_state(new_state):
 
 func _physics_process(delta: float) -> void:
 	state_label.text = str(States.keys()[current_State])
+	change_element()
+	abillity()
 	movement(delta)
 	match current_State:
 		
@@ -224,5 +230,29 @@ func set_direction(hor_direction) -> void:
 
 
 func _on_jumping() -> void:
-
 	velocity.y += -jump
+
+
+func change_element() -> void:
+	current_element = elements[element_index]
+	if Input.is_action_just_pressed("change element"):
+		element_index += 1
+		if element_index >= 4:
+			element_index = 0
+			
+func abillity() -> void:
+	if Input.is_action_just_pressed("abillity"):
+		match current_element:
+			"earth":
+				print("earth")
+				pass
+			"water":
+				pass
+				print("water")
+			"fire":
+				pass
+				print("fire")
+			"air":
+				pass
+				print("air")
+	
