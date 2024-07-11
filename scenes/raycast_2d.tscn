@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://c03doiqf43b55"]
+
+[node name="Raycast2D" type="RayCast2D"]
+scale = Vector2(1.56, 1)
+target_position = Vector2(0, 125)

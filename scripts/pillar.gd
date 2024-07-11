@@ -1,7 +1,9 @@
 extends StaticBody2D
+
+
+@onready var animation_player: AnimationPlayer = %AnimationPlayer
+
+
 func _ready() -> void:
-	%AnimationPlayer.play("pillar")
+	animation_player.play("pillar")
 	await get_tree().process_frame
-	var collider = %RayCast2D.get_collision_point()
-	if !collider: return
-	else: set_position(collider)

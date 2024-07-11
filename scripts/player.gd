@@ -4,6 +4,7 @@ class_name Player extends CharacterBody2D
 signal jumping
 
 
+
 #gravity
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var max_velocity = 1000
@@ -21,6 +22,7 @@ var jump := 1300
 var wall_pushback = 1300
 
 
+@onready var raycast_2d: RayCast2D = $"../Raycast2D"
 
 @onready var animations: AnimatedSprite2D = %animations
 @onready var state_label: Label = %StateLabel
@@ -42,15 +44,18 @@ var current_State = States.IDLE
 
 var current_positon: Vector2 = Vector2(453,520)
 
-func change_state(new_state):
-	current_State = new_state
+func _process(delta: float) -> void:
+	raycast_2d.position = get_global_mouse_position()
 
 func _physics_process(delta: float) -> void:
+
 	state_label.text = str(States.keys()[current_State])
+	
 	change_element()
-	abillity()
+	
 	movement(delta)
 	match current_State:
+		
 		
 		States.IDLE:
 			animations.play("idle")
@@ -61,6 +66,8 @@ func _physics_process(delta: float) -> void:
 				change_state(States.AIR)
 			if !is_on_floor():
 				change_state(States.AIR)
+			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				change_state(States.CASTING)
 
 
 		States.RUN:
@@ -74,6 +81,8 @@ func _physics_process(delta: float) -> void:
 			if !is_on_floor():
 				coyote_timer.start()
 				change_state(States.AIR)
+			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				change_state(States.CASTING)
 
 
 		States.AIR:
@@ -93,6 +102,8 @@ func _physics_process(delta: float) -> void:
 			if is_on_wall_only() and dir != 0:
 				velocity.y = 0
 				change_state(States.SLIDING)
+			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				change_state(States.CASTING)
 
 
 		States.SLIDING:
@@ -105,7 +116,6 @@ func _physics_process(delta: float) -> void:
 					velocity.x += wall_pushback
 				else:
 					pass
-
 			apply_sliding_gravity(delta)
 			if is_on_floor() and velocity.x == 0:
 				change_state(States.IDLE)
@@ -115,20 +125,57 @@ func _physics_process(delta: float) -> void:
 				change_state(States.AIR)
 			if dir == 0 and is_on_wall_only():
 				change_state(States.AIR)
-
-		States.FALL:
-			pass
-			
+			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				change_state(States.CASTING)
+				
 		States.CASTING:
-			pass
-			
-		States.FALL:
-			pass
-			
+			match current_element:
+				"earth":
+					velocity.x = 0
+					%animations.play("abillity")
+					GlobalTimer.start()
+					get_tree().call_group("pillars", "queue_free")
+					get_tree().call_group("box", "queue_free")
+					if raycast_2d.is_colliding():
+						var new_pillar = preload("res://scenes/pillar.tscn").instantiate()
+						var collider = raycast_2d.get_collision_point()
+						new_pillar.position = collider
+						owner.add_child(new_pillar)
+					else:
+						var box = preload("res://scenes/box.tscn").instantiate()
+						box.position = get_global_mouse_position()
+						owner.add_child(box)
+						
+	
+				"water":
+					pass
+					print("water")
+				"fire":
+					pass
+					print("fire")
+				"air":
+					pass
+					print("air")
+
 	move_and_slide()
 
 
+func change_state(new_state):
+	current_State = new_state
 
+func change_states():
+	if velocity.x == 0:
+		change_state(States.IDLE)
+		
+	if is_on_floor() and velocity.x != 0:
+		change_state(States.RUN)
+	
+	if Input.is_action_pressed("jump"):
+		emit_signal("jumping")
+		change_state(States.AIR)
+	
+	if !is_on_wall() and !is_on_floor():
+		change_state(States.AIR)
 
 	#if is_on_floor(): jumps = 1
 	#if !is_on_floor() and !is_on_wall(): %RayCast2D.enabled = true
@@ -194,17 +241,16 @@ func _on_killzone_body_entered(body: Node2D) -> void:
 
 func _on_checkpoint_body_entered(body: Node2D) -> void: current_positon = position
 
-func exit(): get_tree().change_scene_to_file("res://scenes/mainGame.tscn")
-
-func _on_area_2d_body_entered(body: Node2D) -> void: call_deferred("exit")
 
 
 
 func apply_gravity(delta):
 		velocity.y = minf(max_velocity, velocity.y + gravity * delta)
 
+
 func apply_sliding_gravity(delta):
 	velocity.y = minf(max_velocity, velocity.y + sliding_grav * delta)
+
 
 func movement(delta):
 	dir = Input.get_axis("left","right")
@@ -239,20 +285,13 @@ func change_element() -> void:
 		element_index += 1
 		if element_index >= 4:
 			element_index = 0
-			
-func abillity() -> void:
-	if Input.is_action_just_pressed("abillity"):
-		match current_element:
-			"earth":
-				print("earth")
-				pass
-			"water":
-				pass
-				print("water")
-			"fire":
-				pass
-				print("fire")
-			"air":
-				pass
-				print("air")
+
+
+
+func _on_animations_animation_finished() -> void:
+	if %animations.animation == "abillity":
+		change_states()
+	else:
+		return
 	
+

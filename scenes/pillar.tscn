@@ -114,7 +114,6 @@ _data = {
 [node name="Pillar" type="StaticBody2D" groups=["pillars"]]
 scale = Vector2(1.46066, 1.54416)
 collision_layer = 2
-collision_mask = 7
 script = ExtResource("1_fswve")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
@@ -130,25 +129,6 @@ unique_name_in_owner = true
 libraries = {
 "": SubResource("AnimationLibrary_j27b2")
 }
-
-[node name="RayCast2D" type="RayCast2D" parent="."]
-unique_name_in_owner = true
-position = Vector2(0, -29.0005)
-scale = Vector2(5.27674, 0.662)
-target_position = Vector2(0.389231, 5825.27)
-collision_mask = 4
-
-[node name="RayCast2D2" type="RayCast2D" parent="RayCast2D"]
-unique_name_in_owner = true
-position = Vector2(4.54102, -0.213835)
-target_position = Vector2(0.389231, 5825.27)
-collision_mask = 4
-
-[node name="RayCast2D3" type="RayCast2D" parent="RayCast2D"]
-unique_name_in_owner = true
-position = Vector2(-5.05999, 0.764414)
-target_position = Vector2(0.389231, 5825.27)
-collision_mask = 4
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(-86.2624, -192.338, -63.6698, -214.356, 46.5543, -217.594, 86.947, -205.29, 74.6238, -0.647601, -68.4622, 0.647601)

@@ -1,0 +1,35 @@
+[gd_scene load_steps=4 format=3 uid="uid://c5qic8ojqgxha"]
+
+[ext_resource type="Texture2D" uid="uid://bly7igs2todne" path="res://images/icon.svg" id="1_4o1kl"]
+[ext_resource type="Script" path="res://scripts/box.gd" id="1_d3dlj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5qevy"]
+size = Vector2(106, 102)
+
+[node name="Box" type="AnimatableBody2D" groups=["box"]]
+position = Vector2(651, 414)
+script = ExtResource("1_d3dlj")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(28, 26.88)
+scale = Vector2(0.828125, 0.795)
+texture = ExtResource("1_4o1kl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(28, 27)
+shape = SubResource("RectangleShape2D_5qevy")
+
+[node name="Timer" type="Timer" parent="."]
+unique_name_in_owner = true
+one_shot = true
+autostart = true
+
+[node name="Raycasts" type="RayCast2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(-8, 30)
+
+[node name="RayCast2D2" type="RayCast2D" parent="Raycasts"]
+position = Vector2(32, 0)
+
+[node name="RayCast2D3" type="RayCast2D" parent="Raycasts"]
+position = Vector2(72, 0)

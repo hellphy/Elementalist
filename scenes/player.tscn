@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://ro3t3n02pxmm"]
+[gd_scene load_steps=30 format=3 uid="uid://ro3t3n02pxmm"]
 
 [ext_resource type="Script" path="res://scripts/player.gd" id="1_a7c3h"]
 [ext_resource type="Texture2D" uid="uid://c78c8nbqexax0" path="res://images/spritesheet.png" id="2_k8678"]
@@ -121,7 +121,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ywcg7")
 }],
-"loop": true,
+"loop": false,
 "name": &"abillity",
 "speed": 15.0
 }, {
@@ -141,7 +141,7 @@ animations = [{
 "duration": 10.0,
 "texture": SubResource("AtlasTexture_3uhju")
 }],
-"loop": true,
+"loop": false,
 "name": &"dash",
 "speed": 15.0
 }, {
@@ -155,7 +155,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_26g67")
 }],
-"loop": true,
+"loop": false,
 "name": &"fall",
 "speed": 5.0
 }, {
@@ -186,7 +186,7 @@ animations = [{
 "duration": 20.0,
 "texture": SubResource("AtlasTexture_22417")
 }],
-"loop": true,
+"loop": false,
 "name": &"jump",
 "speed": 5.0
 }, {
@@ -217,12 +217,10 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6bbpt"]
 size = Vector2(61, 179)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_7fwgf"]
-size = Vector2(1028, 708)
-
 [node name="Player" type="CharacterBody2D" groups=["Players"]]
-position = Vector2(780, 687)
-collision_mask = 7
+position = Vector2(0, -110)
+scale = Vector2(1.00369, 1)
+collision_mask = 3
 script = ExtResource("1_a7c3h")
 
 [node name="StateLabel" type="Label" parent="."]
@@ -240,37 +238,6 @@ animation = &"idle"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(9.5, 20.5)
 shape = SubResource("RectangleShape2D_6bbpt")
-
-[node name="RayCast2D" type="RayCast2D" parent="."]
-unique_name_in_owner = true
-position = Vector2(21, 46)
-rotation = -1.57079
-target_position = Vector2(0.000312805, 50)
-collision_mask = 4
-
-[node name="RayCast2D" type="RayCast2D" parent="RayCast2D"]
-position = Vector2(-0.000112939, -18)
-rotation = 3.14159
-
-[node name="Area2D" type="Area2D" parent="."]
-position = Vector2(0, -2)
-collision_layer = 16
-collision_mask = 16
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(570, -240)
-shape = SubResource("RectangleShape2D_7fwgf")
-
-[node name="ground" type="RayCast2D" parent="."]
-unique_name_in_owner = true
-position = Vector2(-7, 63)
-scale = Vector2(2.24, 1)
-collision_mask = 2
-
-[node name="RayCast2D3" type="RayCast2D" parent="ground"]
-position = Vector2(17.4107, 0)
-scale = Vector2(0.982143, 1)
-collision_mask = 2
 
 [node name="timer" type="Node" parent="."]
 
@@ -296,6 +263,6 @@ wait_time = 0.15
 one_shot = true
 
 [connection signal="jumping" from="." to="." method="_on_jumping"]
-[connection signal="input_event" from="Area2D" to="." method="_on_area_2d_input_event"]
+[connection signal="animation_finished" from="animations" to="." method="_on_animations_animation_finished"]
 [connection signal="timeout" from="timer/dash" to="." method="_on_dash_timeout"]
 [connection signal="timeout" from="timer/casting" to="." method="_on_casting_timeout"]
