@@ -1,5 +1,8 @@
-[gd_scene format=3 uid="uid://c03doiqf43b55"]
+[gd_scene load_steps=2 format=3 uid="uid://c03doiqf43b55"]
+
+[ext_resource type="Script" path="res://scripts/raycast_2d.gd" id="1_yuwix"]
 
 [node name="Raycast2D" type="RayCast2D"]
 scale = Vector2(1.56, 1)
 target_position = Vector2(0, 125)
+script = ExtResource("1_yuwix")

@@ -18,6 +18,7 @@ config/icon="res://images/icon.svg"
 [autoload]
 
 GlobalTimer="*res://scenes/timer.tscn"
+GlobalRaycast="*res://scenes/raycast_2d.tscn"
 
 [display]
 

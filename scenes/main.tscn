@@ -1,7 +1,6 @@
-[gd_scene load_steps=17 format=3 uid="uid://cqu3ix1wavp2j"]
+[gd_scene load_steps=16 format=3 uid="uid://cqu3ix1wavp2j"]
 
 [ext_resource type="PackedScene" uid="uid://ro3t3n02pxmm" path="res://scenes/player.tscn" id="1_jm4t6"]
-[ext_resource type="PackedScene" uid="uid://c03doiqf43b55" path="res://scenes/raycast_2d.tscn" id="3_ce8j4"]
 [ext_resource type="PackedScene" uid="uid://do14ctfrs2lou" path="res://scenes/progressbar.tscn" id="3_molsb"]
 [ext_resource type="Texture2D" uid="uid://x3n7ys0gt8u0" path="res://images/sandTiles.png" id="4_ex3o4"]
 [ext_resource type="PackedScene" uid="uid://oyw1v33j61bu" path="res://scenes/killzone.tscn" id="4_pb6ae"]
@@ -473,8 +472,6 @@ position = Vector2(155, 519)
 position = Vector2(-11, -208)
 zoom = Vector2(0.8, 0.8)
 position_smoothing_enabled = true
-
-[node name="Raycast2D" parent="." instance=ExtResource("3_ce8j4")]
 
 [node name="killzone" parent="." instance=ExtResource("4_pb6ae")]
 position = Vector2(127, 1493)

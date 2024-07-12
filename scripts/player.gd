@@ -22,8 +22,6 @@ var jump := 1300
 var wall_pushback = 1300
 
 
-@onready var raycast_2d: RayCast2D = $"../Raycast2D"
-
 @onready var animations: AnimatedSprite2D = %animations
 @onready var state_label: Label = %StateLabel
 
@@ -44,8 +42,6 @@ var current_State = States.IDLE
 
 var current_positon: Vector2 = Vector2(453,520)
 
-func _process(delta: float) -> void:
-	raycast_2d.position = get_global_mouse_position()
 
 func _physics_process(delta: float) -> void:
 
@@ -133,19 +129,19 @@ func _physics_process(delta: float) -> void:
 				"earth":
 					velocity.x = 0
 					%animations.play("abillity")
-					GlobalTimer.start()
 					get_tree().call_group("pillars", "queue_free")
 					get_tree().call_group("box", "queue_free")
-					if raycast_2d.is_colliding():
+					GlobalTimer.start()
+						
+					if GlobalRaycast.is_colliding():
 						var new_pillar = preload("res://scenes/pillar.tscn").instantiate()
-						var collider = raycast_2d.get_collision_point()
-						new_pillar.position = collider
 						owner.add_child(new_pillar)
+						return
+				
 					else:
 						var box = preload("res://scenes/box.tscn").instantiate()
-						box.position = get_global_mouse_position()
 						owner.add_child(box)
-						
+						return
 	
 				"water":
 					pass
@@ -177,60 +173,6 @@ func change_states():
 	if !is_on_wall() and !is_on_floor():
 		change_state(States.AIR)
 
-	#if is_on_floor(): jumps = 1
-	#if !is_on_floor() and !is_on_wall(): %RayCast2D.enabled = true
-	#if Input.is_action_just_pressed("jump"):
-	#	if is_on_floor() and jumps == 1 or %CoyoteTimer.time_left > 0 and jumps == 1:
-	#		velocity.y += -1050
-	#		jumps = 0
-	#if Input.is_action_just_released("jump"): velocity.y -= -200
-	#if Input.is_action_just_pressed("dash") and velocity.x != 0 and %Cooldown.time_left == 0.0:
-	#	%animations.play("dash")
-	#	dashing = true
-	#	speed = 1200
-	#	%dash.start(0.3)
-	#	%Cooldown.start(1)
-	#if not is_on_floor():
-	#	if %RayCast2D.is_colliding():
-	#		jumps = 1
-	#		%JumpBuffer.start(0.3)
-	#		%RayCast2D.enabled = false
-	#if Input.is_action_just_pressed("jump") and %JumpBuffer.time_left != 0.0 and jumps == 1:
-	#	jumps = 0
-	#	velocity.y += -900
-	#velocity.y = minf(1000, velocity.y + 1400 * delta)
-	#animationss()
-	#if %ground.is_colliding():
-	#	var collider = %ground.get_collider()
-	#	if collider is StonePlatform: collider.move(delta)
-	#if not %ground.is_colliding(): get_tree().call_group("StonePlatforms", "comeback", delta)
-	#var was_on_floor = is_on_floor()
-	#move_and_slide()
-	#var just_left_ledge = was_on_floor and not is_on_floor() and velocity.y >= 0
-	#if just_left_ledge: %CoyoteTimer.start(0.1)
-	
-	
-
-	
-#func _on_dash_timeout() -> void: 
-#	speed = 600
-#	dashing = false 
-#	
-#	
-#func _on_area_2d_input_event(_viewport: Node, _event: InputEvent, _shape_idx: int) -> void:
-#	if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
-#		%casting.start(0.5)
-#		casting = true 
-#		%animations.play("abillity")
-#		GlobalTimer.start()
-#		get_tree().call_group("pillars", "queue_free")
-#		var new_pillar = preload("res://scenes/pillar.tscn").instantiate()
-#		new_pillar.position = get_global_mouse_position()
-#		owner.add_child(new_pillar)
-#
-
-
-
 
 
 func location(): set_position(current_positon)
@@ -240,8 +182,6 @@ func _on_killzone_body_entered(body: Node2D) -> void:
 	location()
 
 func _on_checkpoint_body_entered(body: Node2D) -> void: current_positon = position
-
-
 
 
 func apply_gravity(delta):
