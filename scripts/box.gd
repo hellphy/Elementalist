@@ -5,7 +5,7 @@ class_name Box extends AnimatableBody2D
 
 
 func _ready() -> void:
-	position = get_global_mouse_position()
+	position = GlobalRaycast.position
 
 func _physics_process(delta: float) -> void:
 	if timer.time_left == 0:

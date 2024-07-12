@@ -38,7 +38,7 @@ var current_element: String
 
 enum States {IDLE, RUN, AIR, SLIDING, CASTING, FALL}
 
-var current_State = States.IDLE
+@export var current_State = States.IDLE
 
 var current_positon: Vector2 = Vector2(453,520)
 
