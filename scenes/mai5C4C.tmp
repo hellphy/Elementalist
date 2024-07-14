@@ -1,6 +1,5 @@
-[gd_scene load_steps=17 format=3 uid="uid://cqu3ix1wavp2j"]
+[gd_scene load_steps=16 format=3 uid="uid://cqu3ix1wavp2j"]
 
-[ext_resource type="Script" path="res://scenes/Raycast2D.gd" id="1_a64bw"]
 [ext_resource type="PackedScene" uid="uid://ro3t3n02pxmm" path="res://scenes/player.tscn" id="1_jm4t6"]
 [ext_resource type="PackedScene" uid="uid://do14ctfrs2lou" path="res://scenes/progressbar.tscn" id="3_molsb"]
 [ext_resource type="Texture2D" uid="uid://x3n7ys0gt8u0" path="res://images/sandTiles.png" id="4_ex3o4"]
@@ -449,10 +448,9 @@ size = Vector2(510, 1196.25)
 [node name="main" type="Node2D"]
 
 [node name="Raycast2D" type="RayCast2D" parent="."]
-position = Vector2(318, 291)
+unique_name_in_owner = true
 scale = Vector2(1.56, 1)
 target_position = Vector2(0, 125)
-script = ExtResource("1_a64bw")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

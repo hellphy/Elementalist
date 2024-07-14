@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c03doiqf43b55"]
+[gd_scene load_steps=2 format=3 uid="uid://0eeti1r4f0pb"]
 
 [ext_resource type="Script" path="res://scripts/raycast_2d.gd" id="1_yuwix"]
 
