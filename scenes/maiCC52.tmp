@@ -1,6 +1,6 @@
 [gd_scene load_steps=17 format=3 uid="uid://cqu3ix1wavp2j"]
 
-[ext_resource type="Script" path="res://scripts/Raycast2D.gd" id="1_0fkq7"]
+[ext_resource type="Script" path="res://scenes/Raycast2D.gd" id="1_a64bw"]
 [ext_resource type="PackedScene" uid="uid://ro3t3n02pxmm" path="res://scenes/player.tscn" id="1_jm4t6"]
 [ext_resource type="PackedScene" uid="uid://do14ctfrs2lou" path="res://scenes/progressbar.tscn" id="3_molsb"]
 [ext_resource type="Texture2D" uid="uid://x3n7ys0gt8u0" path="res://images/sandTiles.png" id="4_ex3o4"]
@@ -196,7 +196,8 @@ texture_region_size = Vector2i(100, 100)
 
 [sub_resource type="TileSet" id="TileSet_bf6rw"]
 tile_size = Vector2i(100, 100)
-physics_layer_0/collision_layer = 3
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 3
 sources/0 = SubResource("TileSetAtlasSource_fd5hm")
 sources/1 = SubResource("TileSetAtlasSource_l4epf")
 
@@ -451,7 +452,7 @@ size = Vector2(510, 1196.25)
 position = Vector2(318, 291)
 scale = Vector2(1.56, 1)
 target_position = Vector2(0, 125)
-script = ExtResource("1_0fkq7")
+script = ExtResource("1_a64bw")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

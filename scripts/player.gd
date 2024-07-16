@@ -21,15 +21,18 @@ var turning_acceleration = 9600
 
 
 #jump variables
-var jump_force : float = 1800
+var jump_force : float = 1600
 var jump_cut : float = 0.25
 var jump_gravity_max : float = 500
 var jump_hang_treshold : float = 2.0
 var jump_hang_gravity_mult : float = 0.1
 var wall_pushback = 1300
 
+@onready var raycast_2d: MainRaycast = $"../Raycast2D"
 
-@onready var raycast_2d: RayCast2D = $"../Raycast2D"
+
+@onready var bottom_raycast: RayCast2D = %BottomRaycast
+@onready var top_raycast: RayCast2D = %TopRaycast
 @onready var animations: AnimatedSprite2D = %animations
 @onready var state_label: Label = %StateLabel
 @onready var label: Label = %Label
@@ -37,6 +40,7 @@ var wall_pushback = 1300
 @onready var cooldown: Timer = %Cooldown
 @onready var jump_buffer: Timer = %JumpBuffer
 @onready var coyote_timer: Timer = %CoyoteTimer
+@onready var wall_jump_delay: Timer = %WallJumpDelay
 
 
 var elements: Array = ["earth", "water", "fire", "air"]
@@ -52,7 +56,7 @@ var current_positon: Vector2 = Vector2(453,520)
 func _physics_process(delta: float) -> void:
 	
 	state_label.text = str(States.keys()[current_State])
-	label.text = str(coyote_timer.time_left)
+	label.text = str(wall_jump_delay.time_left)
 	change_element()
 	movement(delta)
 	apply_gravity(delta)
@@ -90,16 +94,17 @@ func _physics_process(delta: float) -> void:
 
 		States.AIR:
 			#jump buffer from wall 
+			if Input.is_action_just_pressed("jump") and wall_jump_delay.time_left != 0:
+				emit_signal("jumping")
+			#coyote timer jump
 			if Input.is_action_just_pressed("jump") and coyote_timer.time_left != 0:
 				emit_signal("jumping")
-				coyote_timer.stop()
 			#if jump is released lower the jump
 			if Input.is_action_just_released("jump"):
 				velocity.y -= (jump_cut * velocity.y)
-				
+			#fall and jump animation setting
 			if velocity.y > 0:
 				animations.play("fall")
-				
 			if velocity.y < 0:
 				animations.play("jump")
 			#state changes
@@ -117,7 +122,7 @@ func _physics_process(delta: float) -> void:
 		States.SLIDING:
 			#checks which direction you are holding down
 			#and pushes you away from the wall to the opposite direction
-			if Input.is_action_just_pressed("jump"):
+			if Input.is_action_just_pressed("jump") and bottom_raycast.is_colliding() and top_raycast.is_colliding():
 				if dir == 1:
 					emit_signal("jumping")
 					velocity.x += -wall_pushback
@@ -132,10 +137,10 @@ func _physics_process(delta: float) -> void:
 				change_state(States.IDLE)
 			if is_on_floor() and velocity.x != 0:
 				change_state(States.RUN)
-			if !is_on_wall() and !is_on_floor():
-				change_state(States.AIR)
 			if dir == 0 and is_on_wall_only():
-				coyote_timer.start()
+				change_state(States.AIR)
+				wall_jump_delay.start()
+			if !is_on_floor() and !is_on_wall():
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				change_state(States.CASTING)
@@ -146,14 +151,12 @@ func _physics_process(delta: float) -> void:
 			match current_element:
 
 				"earth":
-					velocity.x = 0
 					%animations.play("abillity")
 					#clean up either pillar or box to make sure there is always only one 
 					get_tree().call_group("pillars", "queue_free")
 					get_tree().call_group("box", "queue_free")
 					#start cooldown
 					GlobalTimer.start()
-					
 					#if you click near the ground summons a pillar from it that doesnt move but is taller then box
 					if raycast_2d.is_colliding():
 						var new_pillar = preload("res://scenes/pillar.tscn").instantiate()
@@ -161,16 +164,12 @@ func _physics_process(delta: float) -> void:
 						var collider = raycast_2d.get_collision_point()
 						new_pillar.position = collider
 						owner.add_child(new_pillar)
-						return
-						
 					#if you click in the air spawns a box which is smaller and after period of time starts to fall down
 					else:
 						var box = preload("res://scenes/box.tscn").instantiate()
 						#sets position to the mouse cursor
 						box.position = raycast_2d.position
 						owner.add_child(box)
-						return
-
 				"water":
 					pass
 					print("water")

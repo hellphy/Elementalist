@@ -220,7 +220,6 @@ size = Vector2(61, 179)
 [node name="Player" type="CharacterBody2D" groups=["Players"]]
 position = Vector2(0, -110)
 scale = Vector2(1.00369, 1)
-collision_mask = 3
 script = ExtResource("1_a7c3h")
 
 [node name="StateLabel" type="Label" parent="."]
@@ -259,7 +258,25 @@ one_shot = true
 
 [node name="CoyoteTimer" type="Timer" parent="timer"]
 unique_name_in_owner = true
+wait_time = 0.1
 one_shot = true
+
+[node name="WallJumpDelay" type="Timer" parent="timer"]
+unique_name_in_owner = true
+wait_time = 0.1
+one_shot = true
+
+[node name="BottomRaycast" type="RayCast2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0.996324, 76)
+rotation = -1.57079
+collision_mask = 3
+
+[node name="TopRaycast" type="RayCast2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(0.996324, -35)
+rotation = -1.57079
+collision_mask = 3
 
 [connection signal="jumping" from="." to="." method="_on_jumping"]
 [connection signal="animation_finished" from="animations" to="." method="_on_animations_animation_finished"]
