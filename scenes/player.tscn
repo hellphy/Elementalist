@@ -240,7 +240,7 @@ offset_bottom = -144.0
 [node name="animations" type="AnimatedSprite2D" parent="."]
 unique_name_in_owner = true
 sprite_frames = SubResource("SpriteFrames_xq1br")
-animation = &"idle"
+animation = &"abillity"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(9.5, 20.5)
@@ -259,7 +259,6 @@ one_shot = true
 
 [node name="CoyoteTimer" type="Timer" parent="timer"]
 unique_name_in_owner = true
-wait_time = 0.15
 one_shot = true
 
 [connection signal="jumping" from="." to="." method="_on_jumping"]
