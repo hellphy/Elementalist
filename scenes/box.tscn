@@ -1,51 +1,50 @@
-[gd_scene load_steps=5 format=3 uid="uid://c5qic8ojqgxha"]
+[gd_scene load_steps=5 format=3 uid="uid://druamksgsg0jm"]
 
-[ext_resource type="Texture2D" uid="uid://bly7igs2todne" path="res://images/icon.svg" id="1_4o1kl"]
-[ext_resource type="Script" path="res://scripts/box.gd" id="1_d3dlj"]
+[ext_resource type="Script" path="res://scripts/box.gd" id="1_4fh8a"]
+[ext_resource type="Texture2D" uid="uid://bly7igs2todne" path="res://images/icon.svg" id="1_6vie3"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5qevy"]
-size = Vector2(188, 166)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xgy57"]
+size = Vector2(202, 200)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_fadqf"]
-size = Vector2(175, 235)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a8dgd"]
+size = Vector2(182, 139)
 
 [node name="Box" type="AnimatableBody2D" groups=["box"]]
-position = Vector2(-103, -84)
-script = ExtResource("1_d3dlj")
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(1.4573, 1.30631)
-texture = ExtResource("1_4o1kl")
+position = Vector2(0, -101)
+collision_layer = 2
+script = ExtResource("1_4fh8a")
+metadata/_edit_horizontal_guides_ = [36.0]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-unique_name_in_owner = true
-shape = SubResource("RectangleShape2D_5qevy")
+shape = SubResource("RectangleShape2D_xgy57")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(1.58594, 1.58594)
+texture = ExtResource("1_6vie3")
 
 [node name="Timer" type="Timer" parent="."]
 unique_name_in_owner = true
-wait_time = 3.0
+wait_time = 8.0
 one_shot = true
 autostart = true
 
 [node name="Raycasts" type="RayCast2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(-30, 51)
+position = Vector2(-75, 87)
 collision_mask = 2
+
+[node name="RayCast2D" type="RayCast2D" parent="Raycasts"]
+position = Vector2(75, 0)
 
 [node name="RayCast2D2" type="RayCast2D" parent="Raycasts"]
-position = Vector2(32, 0)
-collision_mask = 2
-
-[node name="RayCast2D3" type="RayCast2D" parent="Raycasts"]
-position = Vector2(72, 0)
-collision_mask = 2
+position = Vector2(147, 0)
 
 [node name="Area2D" type="Area2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(-27, -24)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(28.5, 227.5)
-shape = SubResource("RectangleShape2D_fadqf")
+unique_name_in_owner = true
+position = Vector2(0, 171.5)
+shape = SubResource("RectangleShape2D_a8dgd")
 
 [connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

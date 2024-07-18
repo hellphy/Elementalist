@@ -1,11 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://cqu3ix1wavp2j"]
+[gd_scene load_steps=16 format=3 uid="uid://cqu3ix1wavp2j"]
 
 [ext_resource type="Script" path="res://scripts/Raycast2D.gd" id="1_0fkq7"]
 [ext_resource type="PackedScene" uid="uid://ro3t3n02pxmm" path="res://scenes/player.tscn" id="1_jm4t6"]
 [ext_resource type="PackedScene" uid="uid://do14ctfrs2lou" path="res://scenes/progressbar.tscn" id="3_molsb"]
 [ext_resource type="Texture2D" uid="uid://x3n7ys0gt8u0" path="res://images/sandTiles.png" id="4_ex3o4"]
 [ext_resource type="PackedScene" uid="uid://oyw1v33j61bu" path="res://scenes/killzone.tscn" id="4_pb6ae"]
-[ext_resource type="PackedScene" uid="uid://dkofnct1k316" path="res://scenes/spawner.tscn" id="4_v1336"]
 [ext_resource type="Texture2D" uid="uid://1hoekphadw6q" path="res://images/caveTiles.png" id="4_yr5m2"]
 [ext_resource type="PackedScene" uid="uid://xvpkq843xoes" path="res://scenes/stone_platform.tscn" id="5_1brdw"]
 [ext_resource type="Texture2D" uid="uid://bh3biy447ivsl" path="res://images/bg.jpg" id="8_ptwwq"]
@@ -506,32 +505,6 @@ shape = SubResource("WorldBoundaryShape2D_mvraj")
 position = Vector2(45860, 644)
 scale = Vector2(1.07155, 0.97791)
 shape = SubResource("WorldBoundaryShape2D_mvraj")
-
-[node name="spawners" type="Node" parent="."]
-
-[node name="spawner" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(31375, 203)
-
-[node name="spawner2" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(31364, 399)
-
-[node name="spawner3" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(29728, 797)
-
-[node name="spawner4" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(29726, 992)
-
-[node name="spawner5" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(33200, -192)
-
-[node name="spawner7" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(35755, -484)
-
-[node name="spawner8" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(38776, -1175)
-
-[node name="spawner9" parent="spawners" instance=ExtResource("4_v1336")]
-position = Vector2(38773, -1575)
 
 [node name="stonePlatforms" type="Node" parent="."]
 

@@ -8,6 +8,8 @@ class_name Box extends AnimatableBody2D
 
 func _physics_process(delta: float) -> void:
 	if timer.time_left == 0:
+		area_2d.monitoring = true
+		area_2d.monitorable = true
 		self.position.y += 700 * delta
 	else:
 		return

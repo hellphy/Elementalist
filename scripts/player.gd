@@ -1,65 +1,75 @@
 class_name Player extends CharacterBody2D
 
-
 #signals
 signal jumping
 
+var player_size
 #gravity
 var gravity_acceleration : float = 3840
 var max_velocity = 1000
 var sliding_grav = gravity_acceleration * 0.05
-
-
 #player movement variables
-var face_dir = 1
-var speed = 600
-var max_speed = 1200
-var deceleration = 3000
+var face_dir: int = 1
+var speed: float = 600
+var normal_speed: float = 600
+var dashing_speed: float = 1200
+var deceleration: float = 3000
 var dir
-var acceleration = 2800
-var turning_acceleration = 9600
-
-
+var acceleration: float = 2800
+var turning_acceleration: float = 9600
 #jump variables
 var jump_force : float = 1600
 var jump_cut : float = 0.25
 var jump_gravity_max : float = 500
 var jump_hang_treshold : float = 2.0
 var jump_hang_gravity_mult : float = 0.1
-var wall_pushback = 1300
-
+var wall_pushback: float = 1300
+#reference to raycast that is used for earth abillity
 @onready var raycast_2d: MainRaycast = $"../Raycast2D"
-
-
+#raycasts that check if both are on a wall allow you to wall jump
 @onready var bottom_raycast: RayCast2D = %BottomRaycast
 @onready var top_raycast: RayCast2D = %TopRaycast
+#character animations
 @onready var animations: AnimatedSprite2D = %animations
+#display debuggers
 @onready var state_label: Label = %StateLabel
 @onready var label: Label = %Label
+#players collision shape
+@onready var collision_shape_2d: CollisionShape2D = %CollisionShape2D
 #timers
 @onready var cooldown: Timer = %Cooldown
 @onready var jump_buffer: Timer = %JumpBuffer
 @onready var coyote_timer: Timer = %CoyoteTimer
 @onready var wall_jump_delay: Timer = %WallJumpDelay
-
-
+@onready var dashing: Timer = %Dashing
+#earth abillity variables
 var elements: Array = ["earth", "water", "fire", "air"]
 var element_index = 0
 var current_element: String
-
-
+#state variables
 enum States {IDLE, RUN, AIR, SLIDING, CASTING, FALL}
 static var current_State = States.IDLE
 
+#checkpoint
 var current_positon: Vector2 = Vector2(453,520)
 
+
+func _ready() -> void:
+	#store starting collision size so we can change it to it after dashing is finished
+	player_size = collision_shape_2d.shape.extents.y
+
+
 func _physics_process(delta: float) -> void:
-	
+	#display debuggers
 	state_label.text = str(States.keys()[current_State])
 	label.text = str(wall_jump_delay.time_left)
+	#rotates between the 4 elements
 	change_element()
+	#handles movement input
 	movement(delta)
+	#gravity control
 	apply_gravity(delta)
+	#state manager
 	match current_State:
 
 
@@ -149,7 +159,6 @@ func _physics_process(delta: float) -> void:
 		States.CASTING:
 
 			match current_element:
-
 				"earth":
 					%animations.play("abillity")
 					#clean up either pillar or box to make sure there is always only one 
@@ -166,12 +175,14 @@ func _physics_process(delta: float) -> void:
 						owner.add_child(new_pillar)
 					#if you click in the air spawns a box which is smaller and after period of time starts to fall down
 					else:
-						var box = preload("res://scenes/box.tscn").instantiate()
+						var box = load("res://scenes/box.tscn").instantiate()
 						#sets position to the mouse cursor
 						box.position = raycast_2d.position
 						owner.add_child(box)
 				"water":
-					pass
+					collision_shape_2d.shape.extents.y = player_size / 2
+					speed = dashing_speed
+					dashing.start(1)
 					print("water")
 
 				"fire":
@@ -181,23 +192,19 @@ func _physics_process(delta: float) -> void:
 				"air":
 					pass
 					print("air")
-
+			if velocity.x == 0:
+				change_state(States.IDLE)
+			
+			if is_on_floor() and velocity.x != 0:
+				change_state(States.RUN)
+		
+			if !is_on_wall() and !is_on_floor():
+				change_state(States.AIR)
 	move_and_slide()
 
 #simple state change 
 func change_state(new_state):
 	current_State = new_state
-
-#this is used to change state from casting after animation is finished
-func change_states():
-	if velocity.x == 0:
-		change_state(States.IDLE)
-		
-	if is_on_floor() and velocity.x != 0:
-		change_state(States.RUN)
-	
-	if !is_on_wall() and !is_on_floor():
-		change_state(States.AIR)
 
 
 #------
@@ -232,24 +239,30 @@ func apply_gravity(delta):
 
 func movement(delta):
 	dir = Input.get_axis("left","right")
+	#stop if there is no movement input
 	if dir == 0:
 		velocity.x = Vector2(velocity.x, 0).move_toward(Vector2(0,0), deceleration * delta).x
 		return
-	
+	# If we are doing movement inputs and above max speed, don't accelerate nor decelerate
+	# Except if we are turning
+	# (This keeps our momentum gained from outside or slopes)
 	if abs(velocity.x) >= speed and sign(velocity.x) == dir:
 		return
-		
+	# Deciding between acceleration and turn_acceleration
 	var accel_rate : float = acceleration if sign(velocity.x) == dir else turning_acceleration
-	
+	# Accelerate
 	velocity.x += dir * accel_rate * delta
-	
+	#change face direction based on input direction
 	set_direction(dir)
 
 
 func set_direction(hor_direction) -> void:
+	#if we are not moving dont change face direction
 	if hor_direction == 0:
 		return
+	#flips the player on scale property
 	apply_scale(Vector2(hor_direction * face_dir, 1))
+	#remembers face direction
 	face_dir = hor_direction
 
 
@@ -258,7 +271,9 @@ func _on_jumping() -> void:
 
 
 func change_element() -> void:
+	#element that is currently active
 	current_element = elements[element_index]
+	#on button press change element to next one if we are at the end return back to first one
 	if Input.is_action_just_pressed("change element"):
 		element_index += 1
 		if element_index >= 4:
@@ -267,8 +282,19 @@ func change_element() -> void:
 
 func _on_animations_animation_finished() -> void:
 	if %animations.animation == "abillity":
-		change_states()
+		if velocity.x == 0:
+			change_state(States.IDLE)
+		
+		if is_on_floor() and velocity.x != 0:
+			change_state(States.RUN)
+	
+		if !is_on_wall() and !is_on_floor():
+			change_state(States.AIR)
 	else:
 		return
-	
 
+
+
+func _on_dashing_timeout() -> void:
+	speed = normal_speed
+	collision_shape_2d.shape.extents.y = player_size
