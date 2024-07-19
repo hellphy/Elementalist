@@ -2,6 +2,7 @@ class_name Player extends CharacterBody2D
 
 #signals
 signal jumping
+signal dashing
 
 var player_size
 #gravity
@@ -41,7 +42,8 @@ var wall_pushback: float = 1300
 @onready var jump_buffer: Timer = %JumpBuffer
 @onready var coyote_timer: Timer = %CoyoteTimer
 @onready var wall_jump_delay: Timer = %WallJumpDelay
-@onready var dashing: Timer = %Dashing
+@onready var end_dashing: Timer = %EndDashing
+
 #earth abillity variables
 var elements: Array = ["earth", "water", "fire", "air"]
 var element_index = 0
@@ -84,6 +86,8 @@ func _physics_process(delta: float) -> void:
 			if !is_on_floor():
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				if current_element == "water":
+					emit_signal("dashing",delta)
 				change_state(States.CASTING)
 
 
@@ -99,6 +103,8 @@ func _physics_process(delta: float) -> void:
 				coyote_timer.start()
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				if current_element == "water":
+					emit_signal("dashing",delta)
 				change_state(States.CASTING)
 
 
@@ -126,6 +132,8 @@ func _physics_process(delta: float) -> void:
 				velocity.y = 0
 				change_state(States.SLIDING)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				if current_element == "water":
+					emit_signal("dashing",delta)
 				change_state(States.CASTING)
 
 
@@ -153,6 +161,8 @@ func _physics_process(delta: float) -> void:
 			if !is_on_floor() and !is_on_wall():
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
+				if current_element == "earth":
+					emit_signal("dashing",delta)
 				change_state(States.CASTING)
 
 
@@ -181,10 +191,6 @@ func _physics_process(delta: float) -> void:
 						owner.add_child(box)
 				"water":
 					collision_shape_2d.shape.extents.y = player_size / 2
-					speed = dashing_speed
-					dashing.start(1)
-					print("water")
-
 				"fire":
 					pass
 					print("fire")
@@ -192,14 +198,7 @@ func _physics_process(delta: float) -> void:
 				"air":
 					pass
 					print("air")
-			if velocity.x == 0:
-				change_state(States.IDLE)
-			
-			if is_on_floor() and velocity.x != 0:
-				change_state(States.RUN)
-		
-			if !is_on_wall() and !is_on_floor():
-				change_state(States.AIR)
+
 	move_and_slide()
 
 #simple state change 
@@ -232,6 +231,9 @@ func apply_gravity(delta):
 		
 	if current_State == States.SLIDING:
 		applied_gravity = sliding_grav * delta
+		
+	if current_State == States.CASTING and current_element == "water":
+		applied_gravity = 0
 
 	velocity.y += applied_gravity
 
@@ -268,7 +270,21 @@ func set_direction(hor_direction) -> void:
 
 func _on_jumping() -> void:
 	velocity.y += -jump_force
+	
+func _on_dashing(delta) -> void:
+	position.y -= 200 * delta
+	speed = dashing_speed
+	end_dashing.start(2)
 
+func _on_end_dashing_timeout() -> void:
+	speed = normal_speed
+	collision_shape_2d.shape.extents.y = player_size
+	if velocity.x == 0:
+		change_state(States.IDLE)
+	if is_on_floor() and velocity.x != 0:
+		change_state(States.RUN)
+	if !is_on_wall() and !is_on_floor():
+		change_state(States.AIR)
 
 func change_element() -> void:
 	#element that is currently active
@@ -295,6 +311,6 @@ func _on_animations_animation_finished() -> void:
 
 
 
-func _on_dashing_timeout() -> void:
-	speed = normal_speed
-	collision_shape_2d.shape.extents.y = player_size
+
+
+
