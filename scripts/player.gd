@@ -35,6 +35,8 @@ var wall_pushback: float = 1300
 #display debuggers
 @onready var state_label: Label = %StateLabel
 @onready var label: Label = %Label
+@onready var element: Label = %Element
+
 #players collision shape
 @onready var collision_shape_2d: CollisionShape2D = %CollisionShape2D
 #timers
@@ -64,7 +66,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	#display debuggers
 	state_label.text = str(States.keys()[current_State])
-	label.text = str(wall_jump_delay.time_left)
+	element.text = str(current_element)
+	label.text = str(face_dir)
 	#rotates between the 4 elements
 	change_element()
 	#handles movement input
@@ -87,7 +90,7 @@ func _physics_process(delta: float) -> void:
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
-					emit_signal("dashing",delta)
+					emit_signal("dashing")
 				change_state(States.CASTING)
 
 
@@ -104,7 +107,7 @@ func _physics_process(delta: float) -> void:
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
-					emit_signal("dashing",delta)
+					emit_signal("dashing")
 				change_state(States.CASTING)
 
 
@@ -133,7 +136,7 @@ func _physics_process(delta: float) -> void:
 				change_state(States.SLIDING)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
-					emit_signal("dashing",delta)
+					emit_signal("dashing")
 				change_state(States.CASTING)
 
 
@@ -161,8 +164,8 @@ func _physics_process(delta: float) -> void:
 			if !is_on_floor() and !is_on_wall():
 				change_state(States.AIR)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
-				if current_element == "earth":
-					emit_signal("dashing",delta)
+				if current_element == "water":
+					emit_signal("dashing")
 				change_state(States.CASTING)
 
 
@@ -193,11 +196,8 @@ func _physics_process(delta: float) -> void:
 					collision_shape_2d.shape.extents.y = player_size / 2
 				"fire":
 					pass
-					print("fire")
-
 				"air":
 					pass
-					print("air")
 
 	move_and_slide()
 
@@ -220,6 +220,9 @@ func _on_checkpoint_body_entered(body: Node2D) -> void: current_positon = positi
 func apply_gravity(delta):
 	var applied_gravity : float = 0
 	
+	if current_State == States.CASTING and current_element == "water":
+		return
+	
 	if velocity.y <= max_velocity:
 		applied_gravity = gravity_acceleration * delta
 		
@@ -232,9 +235,6 @@ func apply_gravity(delta):
 	if current_State == States.SLIDING:
 		applied_gravity = sliding_grav * delta
 		
-	if current_State == States.CASTING and current_element == "water":
-		applied_gravity = 0
-
 	velocity.y += applied_gravity
 
 
@@ -271,9 +271,15 @@ func set_direction(hor_direction) -> void:
 func _on_jumping() -> void:
 	velocity.y += -jump_force
 	
-func _on_dashing(delta) -> void:
-	position.y -= 200 * delta
-	speed = dashing_speed
+func _on_dashing() -> void:
+	if is_on_floor():
+		var height = position.y - 300
+		var length = position.x + 200 * face_dir
+		var duration: float = 0.3
+		var water_tween := create_tween()
+		water_tween.set_parallel()
+		water_tween.tween_property(self,"position:y", height, duration)
+		water_tween.tween_property(self, "position:x", length, duration)
 	end_dashing.start(2)
 
 func _on_end_dashing_timeout() -> void:
