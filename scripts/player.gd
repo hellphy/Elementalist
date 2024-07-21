@@ -3,7 +3,10 @@ class_name Player extends CharacterBody2D
 #signals
 signal jumping
 signal dashing
-
+#inputs
+var mouse_button_event = InputEventMouseButton.new()
+var shift_button_event = InputEventKey.new()
+#collisin shape size
 var player_size
 #gravity
 var gravity_acceleration : float = 3840
@@ -75,6 +78,20 @@ func _physics_process(delta: float) -> void:
 	#gravity control
 	apply_gravity(delta)
 	#state manager
+	match current_element:
+		"earth":
+			mouse_button_event.button_index = MOUSE_BUTTON_LEFT
+			change_input(mouse_button_event)
+		"water":
+			shift_button_event.keycode = KEY_SHIFT
+			change_input(shift_button_event)
+		"fire":
+			mouse_button_event.button_index = MOUSE_BUTTON_LEFT
+			change_input(mouse_button_event)
+		"air":
+			mouse_button_event.button_index = MOUSE_BUTTON_LEFT
+			change_input(mouse_button_event)
+			
 	match current_State:
 
 
@@ -193,6 +210,7 @@ func _physics_process(delta: float) -> void:
 						box.position = raycast_2d.position
 						owner.add_child(box)
 				"water":
+					GlobalTimer.start()
 					collision_shape_2d.shape.extents.y = player_size / 2
 				"fire":
 					pass
@@ -270,7 +288,8 @@ func set_direction(hor_direction) -> void:
 
 func _on_jumping() -> void:
 	velocity.y += -jump_force
-	
+
+
 func _on_dashing() -> void:
 	if is_on_floor():
 		var height = position.y - 300
@@ -282,6 +301,7 @@ func _on_dashing() -> void:
 		water_tween.tween_property(self, "position:x", length, duration)
 	end_dashing.start(2)
 
+
 func _on_end_dashing_timeout() -> void:
 	speed = normal_speed
 	collision_shape_2d.shape.extents.y = player_size
@@ -292,16 +312,17 @@ func _on_end_dashing_timeout() -> void:
 	if !is_on_wall() and !is_on_floor():
 		change_state(States.AIR)
 
+
 func change_element() -> void:
 	#element that is currently active
 	current_element = elements[element_index]
 	#on button press change element to next one if we are at the end return back to first one
-	if Input.is_action_just_pressed("change element"):
+	if Input.is_action_just_pressed("change element") and GlobalTimer.time_left == 0.0:
 		element_index += 1
 		if element_index >= 4:
 			element_index = 0
 
-
+#state changer from casting
 func _on_animations_animation_finished() -> void:
 	if %animations.animation == "abillity":
 		if velocity.x == 0:
@@ -316,6 +337,11 @@ func _on_animations_animation_finished() -> void:
 		return
 
 
+func change_input(new_input) -> void:
+	# removes previous key 
+	InputMap.action_erase_events("abillity")
+	# adds a new input key 
+	InputMap.action_add_event("abillity", new_input)
 
 
 
