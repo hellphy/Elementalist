@@ -11,7 +11,7 @@ var player_size
 #gravity
 var gravity_acceleration : float = 3840
 var max_velocity = 1000
-var sliding_grav = gravity_acceleration * 0.05
+var sliding_grav = gravity_acceleration * 0.1
 #player movement variables
 var face_dir: int = 1
 var speed: float = 600
@@ -21,6 +21,8 @@ var deceleration: float = 3000
 var dir
 var acceleration: float = 2800
 var turning_acceleration: float = 9600
+#bools
+var can_move := true
 #jump variables
 var jump_force : float = 1600
 var jump_cut : float = 0.25
@@ -39,12 +41,13 @@ var wall_pushback: float = 1300
 @onready var state_label: Label = %StateLabel
 @onready var label: Label = %Label
 @onready var element: Label = %Element
-
 #players collision shape
 @onready var collision_shape_2d: CollisionShape2D = %CollisionShape2D
 #timers
 @onready var cooldown: Timer = %Cooldown
+#-----unused atm
 @onready var jump_buffer: Timer = %JumpBuffer
+#----
 @onready var coyote_timer: Timer = %CoyoteTimer
 @onready var wall_jump_delay: Timer = %WallJumpDelay
 @onready var end_dashing: Timer = %EndDashing
@@ -56,13 +59,11 @@ var current_element: String
 #state variables
 enum States {IDLE, RUN, AIR, SLIDING, CASTING, FALL}
 static var current_State = States.IDLE
-
 #checkpoint
 var current_positon: Vector2 = Vector2(453,520)
 
-
 func _ready() -> void:
-	#store starting collision size so we can change it to it after dashing is finished
+	#store starting collision size so we can change back to it after dashing is finished
 	player_size = collision_shape_2d.shape.extents.y
 
 
@@ -70,14 +71,14 @@ func _physics_process(delta: float) -> void:
 	#display debuggers
 	state_label.text = str(States.keys()[current_State])
 	element.text = str(current_element)
-	label.text = str(face_dir)
+	label.text = str(dir)
 	#rotates between the 4 elements
 	change_element()
 	#handles movement input
 	movement(delta)
 	#gravity control
 	apply_gravity(delta)
-	#state manager
+	#change input based on which abillity is active
 	match current_element:
 		"earth":
 			mouse_button_event.button_index = MOUSE_BUTTON_LEFT
@@ -94,9 +95,10 @@ func _physics_process(delta: float) -> void:
 			
 	match current_State:
 
-
+		#state manager
 		States.IDLE:
 			animations.play("idle")
+			
 			#state changes
 			if velocity.x != 0:
 				change_state(States.RUN)
@@ -113,6 +115,7 @@ func _physics_process(delta: float) -> void:
 
 		States.RUN:
 			animations.play("run")
+			
 			#state changes
 			if velocity.x == 0:
 				change_state(States.IDLE)
@@ -143,12 +146,13 @@ func _physics_process(delta: float) -> void:
 				animations.play("fall")
 			if velocity.y < 0:
 				animations.play("jump")
+				
 			#state changes
 			if is_on_floor() and velocity.x == 0:
 				change_state(States.IDLE)
 			if is_on_floor() and velocity.x != 0:
 				change_state(States.RUN)
-			if is_on_wall_only() and dir != 0:
+			if is_on_wall_only() and dir != 0 and bottom_raycast.is_colliding() and top_raycast.is_colliding():
 				velocity.y = 0
 				change_state(States.SLIDING)
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
@@ -158,6 +162,7 @@ func _physics_process(delta: float) -> void:
 
 
 		States.SLIDING:
+			animations.play("fall")
 			#checks which direction you are holding down
 			#and pushes you away from the wall to the opposite direction
 			if Input.is_action_just_pressed("jump") and bottom_raycast.is_colliding() and top_raycast.is_colliding():
@@ -210,15 +215,20 @@ func _physics_process(delta: float) -> void:
 						box.position = raycast_2d.position
 						owner.add_child(box)
 				"water":
+					#disable moving during water abillity
+					can_move = false
 					GlobalTimer.start()
+					#change collision shape size
 					collision_shape_2d.shape.extents.y = player_size / 2
+					#increase speed 2x
+					velocity.x = dashing_speed * face_dir
+					animations.play("dash")
 				"fire":
 					pass
 				"air":
 					pass
-
 	move_and_slide()
-
+	
 #simple state change 
 func change_state(new_state):
 	current_State = new_state
@@ -239,7 +249,8 @@ func apply_gravity(delta):
 	var applied_gravity : float = 0
 	
 	if current_State == States.CASTING and current_element == "water":
-		return
+		velocity.y = 0
+	
 	
 	if velocity.y <= max_velocity:
 		applied_gravity = gravity_acceleration * delta
@@ -250,7 +261,7 @@ func apply_gravity(delta):
 	if abs(velocity.y) < jump_hang_treshold:
 		applied_gravity *= jump_hang_gravity_mult
 		
-	if current_State == States.SLIDING:
+	if current_State == States.SLIDING and bottom_raycast.is_colliding() and top_raycast.is_colliding():
 		applied_gravity = sliding_grav * delta
 		
 	velocity.y += applied_gravity
@@ -258,6 +269,8 @@ func apply_gravity(delta):
 
 
 func movement(delta):
+	if !can_move:
+		return
 	dir = Input.get_axis("left","right")
 	#stop if there is no movement input
 	if dir == 0:
@@ -291,19 +304,16 @@ func _on_jumping() -> void:
 
 
 func _on_dashing() -> void:
+	end_dashing.start(1)
 	if is_on_floor():
-		var height = position.y - 300
-		var length = position.x + 200 * face_dir
-		var duration: float = 0.3
-		var water_tween := create_tween()
-		water_tween.set_parallel()
-		water_tween.tween_property(self,"position:y", height, duration)
-		water_tween.tween_property(self, "position:x", length, duration)
-	end_dashing.start(2)
+		var trajectory_tween = create_tween()
+		var height = position.y - 400
+		trajectory_tween.set_parallel()
+		trajectory_tween.tween_property(self,"position:y",height,0.3)
 
 
 func _on_end_dashing_timeout() -> void:
-	speed = normal_speed
+	can_move = true
 	collision_shape_2d.shape.extents.y = player_size
 	if velocity.x == 0:
 		change_state(States.IDLE)
@@ -321,6 +331,7 @@ func change_element() -> void:
 		element_index += 1
 		if element_index >= 4:
 			element_index = 0
+
 
 #state changer from casting
 func _on_animations_animation_finished() -> void:
@@ -342,7 +353,3 @@ func change_input(new_input) -> void:
 	InputMap.action_erase_events("abillity")
 	# adds a new input key 
 	InputMap.action_add_event("abillity", new_input)
-
-
-
-

@@ -149,7 +149,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_crgft")
 }, {
-"duration": 10.0,
+"duration": 20.0,
 "texture": SubResource("AtlasTexture_m4av8")
 }, {
 "duration": 1.0,
@@ -212,13 +212,17 @@ animations = [{
 "loop": true,
 "name": &"run",
 "speed": 18.0
+}, {
+"frames": [],
+"loop": false,
+"name": &"water_abillity",
+"speed": 5.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6bbpt"]
 size = Vector2(61, 179)
 
 [node name="Player" type="CharacterBody2D" groups=["Players"]]
-position = Vector2(0, -110)
 scale = Vector2(1.00369, 1)
 collision_mask = 3
 script = ExtResource("1_a7c3h")
@@ -251,7 +255,7 @@ text = "element
 [node name="animations" type="AnimatedSprite2D" parent="."]
 unique_name_in_owner = true
 sprite_frames = SubResource("SpriteFrames_xq1br")
-animation = &"idle"
+animation = &"fall"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 unique_name_in_owner = true
@@ -276,7 +280,7 @@ one_shot = true
 
 [node name="WallJumpDelay" type="Timer" parent="timer"]
 unique_name_in_owner = true
-wait_time = 0.1
+wait_time = 0.2
 one_shot = true
 
 [node name="EndDashing" type="Timer" parent="timer"]
