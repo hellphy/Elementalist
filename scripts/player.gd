@@ -3,6 +3,7 @@ class_name Player extends CharacterBody2D
 #signals
 signal jumping
 signal dashing
+signal shooting
 #inputs
 var mouse_button_event = InputEventMouseButton.new()
 var shift_button_event = InputEventKey.new()
@@ -71,7 +72,7 @@ func _physics_process(delta: float) -> void:
 	#display debuggers
 	state_label.text = str(States.keys()[current_State])
 	element.text = str(current_element)
-	label.text = str(dir)
+	label.text = str(position)
 	#rotates between the 4 elements
 	change_element()
 	#handles movement input
@@ -110,6 +111,8 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
 					emit_signal("dashing")
+				if current_element == "fire":
+					emit_signal("shooting")
 				change_state(States.CASTING)
 
 
@@ -128,6 +131,8 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
 					emit_signal("dashing")
+				if current_element == "fire":
+					emit_signal("shooting")
 				change_state(States.CASTING)
 
 
@@ -158,6 +163,8 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
 					emit_signal("dashing")
+				if current_element == "fire":
+					emit_signal("shooting")
 				change_state(States.CASTING)
 
 
@@ -188,11 +195,12 @@ func _physics_process(delta: float) -> void:
 			if Input.is_action_just_pressed("abillity") and GlobalTimer.time_left == 0:
 				if current_element == "water":
 					emit_signal("dashing")
+				if current_element == "fire":
+					emit_signal("shooting")
 				change_state(States.CASTING)
 
 
 		States.CASTING:
-
 			match current_element:
 				"earth":
 					%animations.play("abillity")
@@ -224,7 +232,8 @@ func _physics_process(delta: float) -> void:
 					velocity.x = dashing_speed * face_dir
 					animations.play("dash")
 				"fire":
-					pass
+					%animations.play("abillity")
+					GlobalTimer.start()
 				"air":
 					pass
 	move_and_slide()
@@ -312,6 +321,14 @@ func _on_dashing() -> void:
 		trajectory_tween.tween_property(self,"position:y",height,0.3)
 
 
+func _on_shooting() -> void:
+	print("shoot")
+	var new_projectile = preload("res://scenes/fire_projectile.tscn").instantiate()
+	new_projectile.global_position = global_position
+	add_child(new_projectile)
+	print(new_projectile.position)
+
+
 func _on_end_dashing_timeout() -> void:
 	can_move = true
 	collision_shape_2d.shape.extents.y = player_size
@@ -353,3 +370,4 @@ func change_input(new_input) -> void:
 	InputMap.action_erase_events("abillity")
 	# adds a new input key 
 	InputMap.action_add_event("abillity", new_input)
+
